@@ -2,7 +2,7 @@
   "name": "spx_flow",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -12,6 +12,9 @@
   "dependencies": {
     "express": "^4.21.1",
     "node-fetch": "^3.3.2"
+  },
+  {
+    "packageManager": "pnpm@latest"
   },
   "type": "module"
 }
