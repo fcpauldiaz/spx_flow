@@ -16,7 +16,7 @@ const postToNtfy = async (url, conditionKey, data) => {
   const currentTime = Date.now();
   if (currentTime - lastPostTimes[conditionKey] >= POST_INTERVAL) {
     try {
-      const response = await fetch(url, { method: "POST" });
+      const response = await fetch(url, { method: "POST", body: data });
       if (!response.ok) throw new Error(`Failed with status: ${response.status}`);
       console.log(`Posted to ${url} for ${conditionKey} at ${new Date().toISOString()}`);
       lastPostTimes[conditionKey] = currentTime; // Update last post time for this condition
