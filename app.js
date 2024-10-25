@@ -47,6 +47,10 @@ app.post("/api/data", async (req, res) => {
   res.sendStatus(200);
 });
 
+app.get("/health", (req, res) => {
+  res.sendStatus(200);
+});
+
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
