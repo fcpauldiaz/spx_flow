@@ -12,7 +12,7 @@ const lastPostTimes = {
 const POST_INTERVAL = 5 * 60 * 1000; // 5 minutes in milliseconds
 
 // Function to post data with 5-minute interval
-onst postToNtfy = async (url, conditionKey, data) => {
+const postToNtfy = async (url, conditionKey, data) => {
   const currentTime = Date.now();
   if (currentTime - lastPostTimes[conditionKey] >= POST_INTERVAL) {
     try {
