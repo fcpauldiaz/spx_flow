@@ -13,6 +13,6 @@
     "express": "^4.21.1",
     "node-fetch": "^3.3.2"
   },
-  "packageManager": "pnpm@latest",
+  "packageManager": "pnpm@9.12.1",
   "type": "module"
 }
