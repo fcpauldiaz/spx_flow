@@ -78,7 +78,13 @@ app.post("/api/data", async (req, res) => {
   // Get the current gex_flow value (within 5 minute window)
   const currentTime = Date.now();
   const savedGexFlow = currentTime - gexFlowData.timestamp <= GEX_FLOW_TIMEOUT ? gexFlowData.value : null;
-  console.log("savedGexFlow -> ", savedGexFlow);
+  console.log("savedGexFlow -> ", savedGexFlow, "difference flow -> ", Math.abs(flow_middle - flow_bottom));
+
+  // if all values are exactly 0, don't post anything
+  if (eth88_top === null && eth88_bottom === null && orderbook === 0 && flow_middle === 0 && flow_bottom === 0) {
+    return res.sendStatus(200);
+  }
+
   // Check and post based on conditions
   if (eth88_top >= 5 && eth88_top < 6) {
     await postToNtfy("https://ntfy.sh/emini_options88", "emini_options88_top", `Options88: ${eth88_top}`);
@@ -93,16 +99,16 @@ app.post("/api/data", async (req, res) => {
   }
 
   // if flow middle is near 0, by 0.02
-  if (flow_middle >= -0.02 && flow_middle <= 0.02 ) {
+  if (flow_middle >= -0.02 && flow_middle <= 0.02) {
     await postToNtfy("https://ntfy.sh/emini_flow", "emini_flow", `Flow Near Zero: ${flow_middle}`);
   }
 
-  if (flow_middle >= -0.02 && flow_middle <= 0.02 && savedGexFlow !== null) {
+  if (flow_middle >= -0.02 && flow_middle <= 0.02 && savedGexFlow != null) {
     await postToNtfy("https://ntfy.sh/emini_setup", "emini_short_setup", `Short Setup formed`);
   }
 
   // flow middle and flow bottom are near each other
-  if (Math.abs(flow_middle - flow_bottom) <= 0.02 && savedGexFlow !== null) {
+  if (Math.abs(flow_middle - flow_bottom) <= 0.01 && savedGexFlow != null) {
     await postToNtfy("https://ntfy.sh/emini_setup", "emini_long_setup", `Long Setup formed`);
   }
 
