@@ -108,7 +108,7 @@ app.post("/api/data", async (req, res) => {
   }
 
   // flow middle and flow bottom are near each other
-  if (Math.abs(flow_middle - flow_bottom) <= 0.01 && savedGexFlow != null) {
+  if (Math.abs(flow_middle - flow_bottom) <= 0.02 && savedGexFlow != null) {
     await postToNtfy("https://ntfy.sh/emini_setup", "emini_long_setup", `Long Setup formed`);
   }
 
