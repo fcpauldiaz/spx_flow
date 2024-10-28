@@ -78,7 +78,7 @@ app.post("/api/data", async (req, res) => {
   // Get the current gex_flow value (within 5 minute window)
   const currentTime = Date.now();
   const savedGexFlow = currentTime - gexFlowData.timestamp <= GEX_FLOW_TIMEOUT ? gexFlowData.value : null;
-  
+  console.log("savedGexFlow -> ", savedGexFlow);
   // Check and post based on conditions
   if (eth88_top >= 5 && eth88_top < 6) {
     await postToNtfy("https://ntfy.sh/emini_options88", "emini_options88_top", `Options88: ${eth88_top}`);
