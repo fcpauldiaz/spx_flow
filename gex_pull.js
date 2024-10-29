@@ -20,7 +20,6 @@ series24.events.on("validated", function() {
                 gex_flow: up3,
                 currentES: currentES
             },
-            mode: 'no-cors'
         }).then(response => {
             console.log("GEX Ladder Resistance message sent!");
         }).catch(error => {
@@ -34,7 +33,6 @@ series24.events.on("validated", function() {
                 gex_flow: dn3,
                 currentES: currentES
             },
-            mode: 'no-cors'
         }).then(response => {
             console.log("GEX Ladder Support message sent!");
         }).catch(error => {
@@ -47,7 +45,6 @@ series24.events.on("validated", function() {
                 gex_flow: up2,
                 currentES: currentES
             },
-            mode: 'no-cors'
         });
     } else if (currentES <= dn2 && currentES >= dn2 - 1) {
         fetch('https://v0s00gsowwg0wow44o0884ss.rpa.chapilabs.com/api/data', {
@@ -56,7 +53,6 @@ series24.events.on("validated", function() {
                 gex_flow: dn2,
                 currentES: currentES
             },
-            mode: 'no-cors'
         });
     }
 });

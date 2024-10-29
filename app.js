@@ -1,7 +1,9 @@
 import express from "express";
 import fetch from "node-fetch";
+import cors from "cors";
 
 const app = express();
+app.use(cors({ origin: '*' }));
 app.use(express.json());
 
 const lastPostTimes = {
@@ -11,6 +13,7 @@ const lastPostTimes = {
   emini_flow: 0,
   emini_short_setup: 0,
   emini_long_setup: 0,
+  emini_blue_red_intersection: 0,
 };
 const POST_INTERVAL = 5 * 60 * 1000; // 5 minutes in milliseconds
 
