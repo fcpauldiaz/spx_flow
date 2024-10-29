@@ -89,13 +89,6 @@ app.post("/api/data", async (req, res) => {
   }
 
   // Check and post based on conditions
-  if (eth88_top >= 5 && eth88_top < 6) {
-    await postToNtfy("https://ntfy.sh/emini_options88", "emini_options88_top", `${eth88_top}`);
-  }
-
-  if (eth88_bottom <= -5 && eth88_bottom > -6) {
-    await postToNtfy("https://ntfy.sh/emini_options88", "emini_options88_bottom", `${eth88_bottom}`);
-  }
 
   if ((orderbook >=4.8 && orderbook < 6) || (orderbook <= -4.8 && orderbook > -6)) {
     await postToNtfy("https://ntfy.sh/emini_orderbook", "emini_orderbook", `${orderbook}`);
