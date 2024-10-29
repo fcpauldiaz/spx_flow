@@ -110,7 +110,7 @@ app.post("/api/data", async (req, res) => {
     await postToNtfy("https://ntfy.sh/emini_setup", "emini_short_setup", `Short Setup formed`);
   }
   
-  if (Math.abs(flow_middle - flow_top) <= 0.02) {
+  if (Math.abs(flow_middle - flow_bottom) <= 0.02) {
     await postToNtfy("https://ntfy.sh/emini_blue_red_intersection", "emini_blue_red_intersection", `Blue Red Intersection`);
   }
 
