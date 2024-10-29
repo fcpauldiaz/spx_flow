@@ -11,7 +11,7 @@ series24.events.on("validated", function() {
     // Check if the current time is between 5 am and 5 pm
     const currentHour = new Date().getHours();
     const isWithinTimeRange = currentHour >= 5 && currentHour < 5;
-    if (currentES >= up3 - 1 && currentES <= up3 + 2 && isWithinTimeRange) {
+    if (currentES >= up3 - 1 && currentES <= up3 + 2) {
          
         fetch('https://v0s00gsowwg0wow44o0884ss.rpa.chapilabs.com/api/data', {
             method: 'POST', // PUT works too
@@ -24,7 +24,7 @@ series24.events.on("validated", function() {
         }).catch(error => {
             console.error("Error sending GEX Ladder Resistance message:", error);
         });
-    } else if (currentES <= dn3 + 1 && currentES >= dn3 - 2 && isWithinTimeRange) {
+    } else if (currentES <= dn3 + 1 && currentES >= dn3 - 2) {
          
         fetch('https://v0s00gsowwg0wow44o0884ss.rpa.chapilabs.com/api/data', {
             method: 'POST', // PUT works too
@@ -37,7 +37,7 @@ series24.events.on("validated", function() {
         }).catch(error => {
             console.error("Error sending GEX Ladder Support message:", error);
         });
-    } else if (currentES >= up2 - 1 && currentES <= up2 + 2 && isWithinTimeRange) {
+    } else if (currentES >= up && currentES <= up2 + 1) {
         fetch('https://v0s00gsowwg0wow44o0884ss.rpa.chapilabs.com/api/data', {
             method: 'POST', // PUT works too
             body: {
@@ -45,7 +45,7 @@ series24.events.on("validated", function() {
                 currentES: currentES
             }
         });
-    } else if (currentES <= dn2 + 1 && currentES >= dn2 - 2 && isWithinTimeRange) {
+    } else if (currentES <= dn2 && currentES >= dn2 - 1) {
         fetch('https://v0s00gsowwg0wow44o0884ss.rpa.chapilabs.com/api/data', {
             method: 'POST', // PUT works too
             body: {
