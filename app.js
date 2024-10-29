@@ -97,7 +97,7 @@ app.post("/api/data", async (req, res) => {
     await postToNtfy("https://ntfy.sh/emini_options88", "emini_options88_bottom", `${eth88_bottom}`);
   }
 
-  if ((orderbook >=4.9 && orderbook < 6) || (orderbook <= -4.9 && orderbook > -6)) {
+  if ((orderbook >=4.8 && orderbook < 6) || (orderbook <= -4.8 && orderbook > -6)) {
     await postToNtfy("https://ntfy.sh/emini_orderbook", "emini_orderbook", `${orderbook}`);
   }
 
