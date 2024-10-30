@@ -128,6 +128,14 @@ app.post("/api/data", async (req, res) => {
     await postToNtfy("https://ntfy.sh/emini_setup", "emini_long_setup", `Level: ${savedGexFlow}`);
   }
 
+  if (savedGexFlow !== null && orderbook !== null && orderbook <= -4.8 && orderbook > -6) {
+    await postToNtfy("https://ntfy.sh/emini_setup", "emini_long_setup", `Level: ${savedGexFlow}`);
+  }
+
+  if (savedGexFlow !== null && orderbook !== null && orderbook >= 4.8 && orderbook < 6) {
+    await postToNtfy("https://ntfy.sh/emini_setup", "emini_short_setup", `Level: ${savedGexFlow}`);
+  }
+
   res.sendStatus(200);
 });
 
