@@ -15,7 +15,8 @@ const lastPostTimes = {
   emini_long_setup: 0,
   emini_blue_red_intersection: 0,
 };
-const POST_INTERVAL = 5 * 60 * 1000; // 5 minutes in milliseconds
+
+const POST_INTERVAL = 10 * 60 * 1000; // 10 minutes in milliseconds
 
 const gexFlowData = {
   value: null,
@@ -69,9 +70,25 @@ const postToNtfy = async (url, conditionKey, data) => {
 };
 
 app.post("/api/data", async (req, res) => {
-  console.log(req.body.values);
-  const { eth88_top, eth88_bottom, orderbook, flow_middle, flow_bottom, gex_flow } = req.body.values;
+  console.log(req.body?.values);
   
+  // Add default values if properties are missing
+  const values = req.body?.values || {};
+  const {
+    eth88_top = null,
+    eth88_bottom = null,
+    orderbook = null,
+    flow_middle = null,
+    flow_bottom = null,
+    gex_flow = null
+  } = values;
+
+  // Validate that we have the minimum required data
+  if (!req.body?.values) {
+    console.error("Missing values object in request body");
+    return res.status(400).json({ error: "Missing values object in request body" });
+  }
+
   // Update gex_flow if present
   if (gex_flow !== null) {
     gexFlowData.value = gex_flow;
@@ -81,34 +98,33 @@ app.post("/api/data", async (req, res) => {
   // Get the current gex_flow value (within 5 minute window)
   const currentTime = Date.now();
   const savedGexFlow = currentTime - gexFlowData.timestamp <= GEX_FLOW_TIMEOUT ? gexFlowData.value : null;
-  console.log("savedGexFlow -> ", savedGexFlow, "difference flow -> ", Math.abs(flow_middle - flow_bottom));
+  console.log("savedGexFlow -> ", savedGexFlow, "difference flow -> ", flow_middle !== null && flow_bottom !== null ? Math.abs(flow_middle - flow_bottom) : "N/A");
 
-  // if all values are exactly 0, don't post anything
-  if (eth88_top === null && eth88_bottom === null && orderbook === 0 && flow_middle === 0 && flow_bottom === 0) {
+  // if all values are null or 0, don't post anything
+  if (eth88_top === null && eth88_bottom === null && orderbook === null && flow_middle === null && flow_bottom === null) {
     return res.sendStatus(200);
   }
 
-  // Check and post based on conditions
-
-  if ((orderbook >=4.8 && orderbook < 6) || (orderbook <= -4.8 && orderbook > -6)) {
+  // Check and post based on conditions - add null checks before each condition
+  if (orderbook !== null && ((orderbook >= 4.8 && orderbook < 6) || (orderbook <= -4.8 && orderbook > -6))) {
     await postToNtfy("https://ntfy.sh/emini_orderbook", "emini_orderbook", `${orderbook}`);
   }
 
   // if flow middle is near 0, by 0.02
-  if (flow_middle >= -0.02 && flow_middle <= 0.02) {
+  if (flow_middle !== null && flow_middle >= -0.02 && flow_middle <= 0.02) {
     await postToNtfy("https://ntfy.sh/emini_flow", "emini_flow", `Flow Near Zero: ${flow_middle}`);
   }
 
-  if (flow_middle >= -0.02 && flow_middle <= 0.02 && savedGexFlow != null) {
+  if (flow_middle !== null && flow_middle >= -0.02 && flow_middle <= 0.02 && savedGexFlow !== null) {
     await postToNtfy("https://ntfy.sh/emini_setup", "emini_short_setup", `Level: ${savedGexFlow}`);
   }
   
-  if (Math.abs(flow_middle - flow_bottom) <= 0.01) {
-    await postToNtfy("https://ntfy.sh/emini_blue_red_intersection", "emini_blue_red_intersection",  Math.abs(flow_middle - flow_bottom));
+  if (flow_middle !== null && flow_bottom !== null && Math.abs(flow_middle - flow_bottom) <= 0.01) {
+    await postToNtfy("https://ntfy.sh/emini_blue_red_intersection", "emini_blue_red_intersection", Math.abs(flow_middle - flow_bottom));
   }
 
   // flow middle and flow bottom are near each other
-  if (Math.abs(flow_middle - flow_bottom) <= 0.01 && savedGexFlow != null) {
+  if (flow_middle !== null && flow_bottom !== null && Math.abs(flow_middle - flow_bottom) <= 0.01 && savedGexFlow !== null) {
     await postToNtfy("https://ntfy.sh/emini_setup", "emini_long_setup", `Level: ${savedGexFlow}`);
   }
 
