@@ -80,7 +80,8 @@ app.post("/api/data", async (req, res) => {
     orderbook = null,
     flow_middle = null,
     flow_bottom = null,
-    gex_flow = null
+    gex_flow = null,
+    current_es = null
   } = values;
 
   // Validate that we have the minimum required data
@@ -110,30 +111,29 @@ app.post("/api/data", async (req, res) => {
     await postToNtfy("https://ntfy.sh/emini_orderbook", "emini_orderbook", `${orderbook}`);
   }
 
+  const flow_near_zero = flow_middle !== null && flow_middle >= -0.02 && flow_middle <= 0.02;
+  const flow_blue_red_intersection = flow_middle !== null && flow_bottom !== null && Math.abs(flow_middle - flow_bottom) <= 0.01;
+  const flow_setup = flow_near_zero || flow_blue_red_intersection;
+
   // if flow middle is near 0, by 0.02
   if (flow_middle !== null && flow_middle >= -0.02 && flow_middle <= 0.02) {
     await postToNtfy("https://ntfy.sh/emini_flow", "emini_flow", `Flow Near Zero: ${flow_middle}`);
-  }
-
-  if (flow_middle !== null && flow_middle >= -0.02 && flow_middle <= 0.02 && savedGexFlow !== null) {
-    await postToNtfy("https://ntfy.sh/emini_setup", "emini_short_setup", `Level: ${savedGexFlow}`);
   }
   
   if (flow_middle !== null && flow_bottom !== null && Math.abs(flow_middle - flow_bottom) <= 0.01) {
     await postToNtfy("https://ntfy.sh/emini_blue_red_intersection", "emini_blue_red_intersection", Math.abs(flow_middle - flow_bottom));
   }
 
-  // flow middle and flow bottom are near each other
-  if (flow_middle !== null && flow_bottom !== null && Math.abs(flow_middle - flow_bottom) <= 0.01 && savedGexFlow !== null) {
-    await postToNtfy("https://ntfy.sh/emini_setup", "emini_long_setup", `Level: ${savedGexFlow}`);
+  if (flow_setup && savedGexFlow !== null) {
+    await postToNtfy("https://ntfy.sh/emini_setup", "emini_setup", `Flow + Option Level: ${savedGexFlow}`);
   }
 
   if (savedGexFlow !== null && orderbook !== null && orderbook <= -4.8 && orderbook > -6) {
-    await postToNtfy("https://ntfy.sh/emini_setup", "emini_long_setup", `Level: ${savedGexFlow}`);
+    await postToNtfy("https://ntfy.sh/emini_setup", "emini_long_setup", `Order book + Option Level: ${savedGexFlow}`);
   }
 
   if (savedGexFlow !== null && orderbook !== null && orderbook >= 4.8 && orderbook < 6) {
-    await postToNtfy("https://ntfy.sh/emini_setup", "emini_short_setup", `Level: ${savedGexFlow}`);
+    await postToNtfy("https://ntfy.sh/emini_setup", "emini_short_setup", `Order book + Option Level: ${savedGexFlow}`);
   }
 
   res.sendStatus(200);

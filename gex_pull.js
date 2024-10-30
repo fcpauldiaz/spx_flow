@@ -14,13 +14,16 @@ series24.events.on("validated", function() {
     if (currentES >= up3 - 1 && currentES <= up3 + 2) {
          
         fetch('https://v0s00gsowwg0wow44o0884ss.rpa.chapilabs.com/api/data', {
-            method: 'POST', // PUT works too
-            body: {
-                values: {
-                  gex_flow: up3,
-                  currentES: currentES
-                }
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
             },
+            body: JSON.stringify({
+                values: {
+                    gex_flow: up3,
+                    currentES: currentES
+                }
+            }),
         }).then(response => {
             console.log("GEX Ladder Resistance message sent!");
         }).catch(error => {
@@ -29,13 +32,16 @@ series24.events.on("validated", function() {
     } else if (currentES <= dn3 + 1 && currentES >= dn3 - 2) {
          
         fetch('https://v0s00gsowwg0wow44o0884ss.rpa.chapilabs.com/api/data', {
-            method: 'POST', // PUT works too
-            body: {
-                values: {
-                  gex_flow: dn3,
-                  currentES: currentES
-                }
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
             },
+            body: JSON.stringify({
+                values: {
+                    gex_flow: dn3,
+                    currentES: currentES
+                }
+            }),
         }).then(response => {
             console.log("GEX Ladder Support message sent!");
         }).catch(error => {
@@ -43,23 +49,29 @@ series24.events.on("validated", function() {
         });
     } else if (currentES >= up2 && currentES <= up2 + 1) {
         fetch('https://v0s00gsowwg0wow44o0884ss.rpa.chapilabs.com/api/data', {
-            method: 'POST', // PUT works too
-            body: {
-                values: {
-                  gex_flow: up2,
-                  currentES: currentES
-                }
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
             },
+            body: JSON.stringify({
+                values: {
+                    gex_flow: up2,
+                    currentES: currentES
+                }
+            }),
         });
     } else if (currentES <= dn2 && currentES >= dn2 - 1) {
         fetch('https://v0s00gsowwg0wow44o0884ss.rpa.chapilabs.com/api/data', {
-            method: 'POST', // PUT works too
-            body: {
-                values: {
-                  gex_flow: dn2,
-                  currentES: currentES
-                }
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
             },
+            body: JSON.stringify({
+                values: {
+                    gex_flow: dn2,
+                    currentES: currentES
+                }
+            }),
         });
     }
 });
