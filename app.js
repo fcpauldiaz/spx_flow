@@ -102,7 +102,7 @@ app.post("/api/data", async (req, res) => {
   console.log("savedGexFlow -> ", savedGexFlow, "difference flow -> ", flow_middle !== null && flow_bottom !== null ? Math.abs(flow_middle - flow_bottom) : "N/A");
 
   // if all values are null or 0, don't post anything
-  if (eth88_top === null && eth88_bottom === null && orderbook === null && flow_middle === null && flow_bottom === null) {
+  if (eth88_top === null && eth88_bottom === null && orderbook === 0 && flow_middle === 0 && flow_bottom === 0) {
     return res.sendStatus(200);
   }
 

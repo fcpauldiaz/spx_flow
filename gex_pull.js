@@ -47,31 +47,5 @@ series24.events.on("validated", function() {
         }).catch(error => {
             console.error("Error sending GEX Ladder Support message:", error);
         });
-    } else if (currentES >= up2 && currentES <= up2 + 1) {
-        fetch('https://v0s00gsowwg0wow44o0884ss.rpa.chapilabs.com/api/data', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                values: {
-                    gex_flow: up2,
-                    currentES: currentES
-                }
-            }),
-        });
-    } else if (currentES <= dn2 && currentES >= dn2 - 1) {
-        fetch('https://v0s00gsowwg0wow44o0884ss.rpa.chapilabs.com/api/data', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                values: {
-                    gex_flow: dn2,
-                    currentES: currentES
-                }
-            }),
-        });
     }
 });
