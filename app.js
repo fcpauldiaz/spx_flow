@@ -122,7 +122,7 @@ app.post("/api/data", async (req, res) => {
 
   // Update sentiment at 4 AM
   const currentHour = new Date().getHours();
-  if (currentHour === 4 && flow_middle !== null) {
+  if (currentHour === 8 && flow_middle !== null) {
     updateFlowData('sentiment', flow_middle > 0 ? "bullish" : "bearish");
   }
 
