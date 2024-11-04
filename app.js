@@ -156,7 +156,7 @@ app.post("/api/data", async (req, res) => {
     Math.abs(flow_middle - flow_bottom) <= 0.01;
   const flow_setup = flow_near_zero || flow_blue_red_intersection;
 
-  // Update your notification conditions to use the new structure
+  // Flow + Option Level
   if (flow_setup && savedFlowUpLevel !== null) {
     await postToNtfy("https://ntfy.sh/emini_setup", "emini_short_setup", 
       `Flow + Option Level: ${savedFlowUpLevel} + Sentiment Flow: ${currentSentiment}`);
@@ -167,14 +167,26 @@ app.post("/api/data", async (req, res) => {
       `Flow + Option Level: ${savedFlowDnLevel} + Sentiment Flow: ${currentSentiment}`);
   }
 
+  // Option Flow + Weak Option Level
   if (flow_near_zero && savedFlowWeakUpLevel !== null) {
     await postToNtfy("https://ntfy.sh/emini_setup", "emini_weak_short_setup", 
       `Flow + Option Level: ${savedFlowWeakUpLevel} + Sentiment Flow: ${currentSentiment}`);
   }
 
-  if (flow_near_zero && savedFlowWeakDnLevel !== null) {
+  if (flow_near_zero  && savedFlowWeakDnLevel !== null) {
     await postToNtfy("https://ntfy.sh/emini_setup", "emini_weak_long_setup", 
       `Flow + Option Level: ${savedFlowWeakDnLevel} + Sentiment Flow: ${currentSentiment}`);
+  }
+
+  // Order book + WeakOption Level
+  if (orderbook !== null && savedFlowWeakDnLevel !== null && orderbook <= -4.8 && orderbook > -6) {
+    await postToNtfy("https://ntfy.sh/emini_setup", "emini_weak_long_setup",
+      `Order book + Option Level: ${savedFlowWeakDnLevel} + Sentiment Flow: ${currentSentiment}`);
+  }
+
+   if (orderbook !== null && savedFlowWeakUpLevel !== null && orderbook >= 4.8 && orderbook < 6) {
+    await postToNtfy("https://ntfy.sh/emini_setup", "emini_weak_short_setup",
+      `Order book + Option Level: ${savedFlowWeakUpLevel} + Sentiment Flow: ${currentSentiment}`);
   }
 
   // if (flow_middle !== null && flow_bottom !== null && Math.abs(flow_middle - flow_bottom) <= 0.01) {
@@ -186,6 +198,7 @@ app.post("/api/data", async (req, res) => {
       `Flow + Option Level: ${savedFlowUpLevel} + Sentiment Flow: ${currentSentiment}`);
   }
 
+  // Order book + Gex Ladder Level
   if (savedGexLevel !== null && orderbook !== null && orderbook <= -4.8 && orderbook > -6) {
     await postToNtfy("https://ntfy.sh/emini_setup", "emini_long_setup", `Order book + Gex Ladder Level: ${savedGexLevel} + Sentiment Flow: ${sentimentData.value}`);
   }
