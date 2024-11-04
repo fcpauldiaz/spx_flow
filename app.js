@@ -21,7 +21,7 @@ const sentimentData = {
   timestamp: 0
 };
 const SENTIMENT_TIMEOUT = 10 * 60 * 60 * 1000; // 10 hours in milliseconds
-
+const FLOW_TIMEOUT = 5 * 60 * 1000; // 5 minutes in milliseconds
 const FLOW_LEVEL_TIMEOUT = 5 * 60 * 1000; // 5 minutes in milliseconds
 
 // Add Discord webhook URL constant (you should replace this with your actual webhook URL)
@@ -79,8 +79,7 @@ const flowData = {
   sentiment: { value: null, timestamp: 0 }
 };
 
-const FLOW_TIMEOUT = 5 * 60 * 1000; // 5 minutes in milliseconds
-const SENTIMENT_TIMEOUT = 10 * 60 * 60 * 1000; // 10 hours in milliseconds
+
 
 // Helper function to update flow data
 const updateFlowData = (key, value) => {
