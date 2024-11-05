@@ -25,6 +25,9 @@ const FLOW_TIMEOUT = 5 * 60 * 1000; // 5 minutes in milliseconds
 
 // Add Discord webhook URL constant (you should replace this with your actual webhook URL)
 const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL || "YOUR_DISCORD_WEBHOOK_URL";
+// Get sentiment directly from env var
+const SENTIMENT = process.env.INITIAL_SENTIMENT || null;
+console.log(`Using sentiment from environment: ${SENTIMENT}`);
 
 // Add function to post to Discord
 const postToDiscord = async (message) => {
@@ -68,14 +71,13 @@ const postToNtfy = async (url, conditionKey, data) => {
   }
 };
 
-// Replace the individual data objects with a single flowData structure
+// Initialize flowData with sentiment from env var if available
 const flowData = {
   flow_up_level: { value: null, timestamp: 0 },
   flow_dn_level: { value: null, timestamp: 0 },
   flow_weak_up_level: { value: null, timestamp: 0 },
   flow_weak_dn_level: { value: null, timestamp: 0 },
-  gex_level: { value: null, timestamp: 0 },
-  sentiment: { value: null, timestamp: 0 }
+  gex_level: { value: null, timestamp: 0 }
 };
 
 
@@ -91,6 +93,9 @@ const updateFlowData = (key, value) => {
 
 // Helper function to get current flow value
 const getCurrentFlow = (key, timeout = FLOW_TIMEOUT) => {
+  if (key === 'sentiment') {
+    return SENTIMENT;
+  }
   const currentTime = Date.now();
   return currentTime - flowData[key].timestamp <= timeout ? flowData[key].value : null;
 };
@@ -119,12 +124,6 @@ app.post("/api/data", async (req, res) => {
     return res.status(400).json({ error: "Missing values object in request body" });
   }
 
-  // Update sentiment at 4 AM
-  const currentHour = new Date().getHours();
-  if (currentHour === 8 && flow_middle !== null) {
-    updateFlowData('sentiment', flow_middle > 0 ? "bullish" : "bearish");
-  }
-
   // Update flow levels
   updateFlowData('flow_up_level', flow_up_level);
   updateFlowData('flow_dn_level', flow_dn_level);
@@ -132,12 +131,18 @@ app.post("/api/data", async (req, res) => {
   updateFlowData('flow_weak_dn_level', flow_weak_dn_level);
   updateFlowData('gex_level', gex_level);
 
+   // Update sentiment at 4 AM
+  const currentHour = new Date().getHours();
+  if (currentHour === 8 && flow_middle !== null) {
+    updateFlowData('sentiment', flow_middle > 0 ? "bullish" : "bearish");
+  }
+
   const savedFlowUpLevel = getCurrentFlow('flow_up_level');
   const savedFlowDnLevel = getCurrentFlow('flow_dn_level');
   const savedFlowWeakUpLevel = getCurrentFlow('flow_weak_up_level');
   const savedFlowWeakDnLevel = getCurrentFlow('flow_weak_dn_level');
   const savedGexLevel = getCurrentFlow('gex_level');
-  const currentSentiment = getCurrentFlow('sentiment', SENTIMENT_TIMEOUT);
+  const currentSentiment = SENTIMENT;
 
   console.log("Current flow levels:", {
     up: savedFlowUpLevel,
