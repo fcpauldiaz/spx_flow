@@ -193,6 +193,17 @@ app.post("/api/data", async (req, res) => {
       `Order book + Option Level: ${savedFlowWeakUpLevel} + Sentiment Flow: ${currentSentiment}`);
   }
 
+   // Order book + WeakOption Level
+  if (orderbook !== null && savedFlowDnLevel !== null && orderbook <= -4.8 && orderbook > -6) {
+    await postToNtfy("https://ntfy.sh/emini_setup", "emini_weak_long_setup",
+      `Order book + Option Level: ${savedFlowDnLevel} + Sentiment Flow: ${currentSentiment}`);
+  }
+
+   if (orderbook !== null && savedFlowUpLevel !== null && orderbook >= 4.8 && orderbook < 6) {
+    await postToNtfy("https://ntfy.sh/emini_setup", "emini_weak_short_setup",
+      `Order book + Option Level: ${savedFlowUpLevel} + Sentiment Flow: ${currentSentiment}`);
+  }
+
   // if (flow_middle !== null && flow_bottom !== null && Math.abs(flow_middle - flow_bottom) <= 0.01) {
   //   await postToNtfy("https://ntfy.sh/emini_blue_red_intersection", "emini_blue_red_intersection", Math.abs(flow_middle - flow_bottom));
   // }
