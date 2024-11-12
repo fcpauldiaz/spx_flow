@@ -73,7 +73,7 @@ const postToNtfy = async (url, conditionKey, data) => {
 };
 
 app.post("/api/data", async (req, res) => {
-  console.log(req.body?.values, sentimentData.value);
+  console.log(req.body?.values, SENTIMENT);
   console.log("Current time:", new Date().toISOString());
   
   const values = req.body?.values || {};
