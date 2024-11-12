@@ -27,7 +27,7 @@ const POST_INTERVAL = 5 * 60 * 1000; // 5 minutes in milliseconds
 // Add Discord webhook URL constant (you should replace this with your actual webhook URL)
 const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL  || "YOUR_DISCORD_WEBHOOK_URL";
 // Get sentiment directly from env var
-const SENTIMENT = process.env.INITIAL_SENTIMENT || null;
+let SENTIMENT = process.env.INITIAL_SENTIMENT || null;
 console.log(`Using sentiment from environment: ${SENTIMENT}`);
 
 // Add function to post to Discord
@@ -72,28 +72,6 @@ const postToNtfy = async (url, conditionKey, data) => {
   }
 };
 
-const flowData = {
-  sentiment: { value: null, timestamp: 0 }
-};
-
-// Helper function to update flow data
-const updateFlowData = (key, value) => {
-  if (value !== null) {
-    flowData[key].value = value;
-    flowData[key].timestamp = Date.now();
-    console.log(`Updated ${key} ->`, value, "at", new Date().toISOString());
-  }
-};
-
-// Helper function to get current flow value
-const getCurrentFlow = (key, timeout = FLOW_TIMEOUT) => {
-  if (key === 'sentiment') {
-    return SENTIMENT;
-  }
-  const currentTime = Date.now();
-  return currentTime - flowData[key].timestamp <= timeout ? flowData[key].value : null;
-};
-
 app.post("/api/data", async (req, res) => {
   console.log(req.body?.values, sentimentData.value);
   console.log("Current time:", new Date().toISOString());
@@ -118,7 +96,8 @@ app.post("/api/data", async (req, res) => {
    // Update sentiment at 4 AM
   const currentHour = new Date().getHours();
   if (currentHour === 8 && flow_middle !== null) {
-    updateFlowData('sentiment', flow_middle > 0 ? "bullish" : "bearish");
+    //updateFlowData('sentiment', flow_middle > 0 ? "bullish" : "bearish");
+    SENTIMENT = flow_middle > 0 ? "bullish" : "bearish";
   }
 
   const currentSentiment = SENTIMENT;
