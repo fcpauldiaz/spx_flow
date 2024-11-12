@@ -107,7 +107,7 @@ app.post("/api/data", async (req, res) => {
   // Rest of your existing code, but use the new helper functions
   const flow_near_zero = flow_middle !== null && flow_middle >= -0.02 && flow_middle <= 0.02;
   const flow_blue_red_intersection = flow_middle !== null && flow_bottom !== null && 
-    Math.abs(flow_middle - flow_bottom) <= 0.01;
+    Math.abs(flow_middle - flow_bottom) <= 0.02;
   const flow_setup = flow_near_zero || flow_blue_red_intersection;
 
   const es_near_flow_resistance_1 = current_es !== null && flow_resistance_1 !== null && 
@@ -178,13 +178,13 @@ app.post("/api/data", async (req, res) => {
   // ETH88 between -4.8 and -6 and weak option level
   if (eth88_bottom !== null && eth88_bottom >= -4.8 && eth88_bottom < -6 && (es_near_flow_support_1 || es_near_flow_support_2)) {
     await postToNtfy("https://ntfy.sh/emini_setup", "emini_long_setup", 
-      `ETH88 + Option Level: ${eth88_bottom} + Sentiment Flow: ${currentSentiment}`);
+      `ETH88 + ${eth88_bottom} + Option Level: ${es_near_flow_support_1 ? flow_support_1 : flow_support_2} + Sentiment Flow: ${currentSentiment}`);
   }
   
   // ETH88 between 4.8 and 6 and weak option level
   if (eth88_top !== null && eth88_top >= 4.8 && eth88_top < 6 && (es_near_flow_resistance_1 || es_near_flow_resistance_2)) {
     await postToNtfy("https://ntfy.sh/emini_setup", "emini_short_setup", 
-      `ETH88 + Option Level: ${eth88_top} + Sentiment Flow: ${currentSentiment}`);
+      `ETH88 + ${eth88_top} + Option Level: ${es_near_flow_resistance_1 ? flow_resistance_1 : flow_resistance_2} + Sentiment Flow: ${currentSentiment}`);
   }
 
   // Order book + Gex Ladder Level
