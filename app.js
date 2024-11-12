@@ -195,17 +195,17 @@ app.post("/api/data", async (req, res) => {
   }
 
   // Order book + Gex Ladder Level
-  if (savedGexLevel !== null && orderbook !== null && orderbook <= -4.8 && orderbook > -6) {
-    await postToNtfy("https://ntfy.sh/emini_setup", "emini_long_setup", `Order book + Gex Ladder Level: ${savedGexLevel} + Sentiment Flow: ${sentimentData.value}`);
-  }
+  // if (savedGexLevel !== null && orderbook !== null && orderbook <= -4.8 && orderbook > -6) {
+  //   await postToNtfy("https://ntfy.sh/emini_setup", "emini_long_setup", `Order book + Gex Ladder Level: ${savedGexLevel} + Sentiment Flow: ${sentimentData.value}`);
+  // }
 
-  if (savedGexLevel !== null && orderbook !== null && orderbook >= 4.8 && orderbook < 6) {
-    await postToNtfy("https://ntfy.sh/emini_setup", "emini_short_setup", `Order book + Gex Ladder Level: ${savedGexLevel} + Sentiment Flow: ${sentimentData.value}`);
-  }
+  // if (savedGexLevel !== null && orderbook !== null && orderbook >= 4.8 && orderbook < 6) {
+  //   await postToNtfy("https://ntfy.sh/emini_setup", "emini_short_setup", `Order book + Gex Ladder Level: ${savedGexLevel} + Sentiment Flow: ${sentimentData.value}`);
+  // }
 
-  if ((savedFlowUpLevel != null || savedFlowDnLevel != null) && savedGexLevel !== null && flow_setup) {
-    await postToNtfy("https://ntfy.sh/emini_setup_strong", "emini_setup_strong", `Flow Setup + Flow Level: ${savedFlowUpLevel || savedFlowDnLevel} + Gex Ladder Level: ${savedGexLevel}`);
-  }
+  // if ((savedFlowUpLevel != null || savedFlowDnLevel != null) && savedGexLevel !== null && flow_setup) {
+  //   await postToNtfy("https://ntfy.sh/emini_setup_strong", "emini_setup_strong", `Flow Setup + Flow Level: ${savedFlowUpLevel || savedFlowDnLevel} + Gex Ladder Level: ${savedGexLevel}`);
+  // }
 
   res.sendStatus(200);
 });
