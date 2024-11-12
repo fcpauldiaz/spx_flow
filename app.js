@@ -25,7 +25,7 @@ const FLOW_TIMEOUT = 5 * 60 * 1000; // 5 minutes in milliseconds
 const POST_INTERVAL = 5 * 60 * 1000; // 5 minutes in milliseconds
 
 // Add Discord webhook URL constant (you should replace this with your actual webhook URL)
-const DISCORD_WEBHOOK_URL = process.env.  || "YOUR_DISCORD_WEBHOOK_URL";
+const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL  || "YOUR_DISCORD_WEBHOOK_URL";
 // Get sentiment directly from env var
 const SENTIMENT = process.env.INITIAL_SENTIMENT || null;
 console.log(`Using sentiment from environment: ${SENTIMENT}`);
