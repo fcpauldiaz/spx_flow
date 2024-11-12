@@ -25,7 +25,7 @@ const FLOW_TIMEOUT = 5 * 60 * 1000; // 5 minutes in milliseconds
 const POST_INTERVAL = 5 * 60 * 1000; // 5 minutes in milliseconds
 
 // Add Discord webhook URL constant (you should replace this with your actual webhook URL)
-const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL || "YOUR_DISCORD_WEBHOOK_URL";
+const DISCORD_WEBHOOK_URL = process.env.  || "YOUR_DISCORD_WEBHOOK_URL";
 // Get sentiment directly from env var
 const SENTIMENT = process.env.INITIAL_SENTIMENT || null;
 console.log(`Using sentiment from environment: ${SENTIMENT}`);
@@ -72,16 +72,9 @@ const postToNtfy = async (url, conditionKey, data) => {
   }
 };
 
-// Initialize flowData with sentiment from env var if available
 const flowData = {
-  flow_up_level: { value: null, timestamp: 0 },
-  flow_dn_level: { value: null, timestamp: 0 },
-  flow_weak_up_level: { value: null, timestamp: 0 },
-  flow_weak_dn_level: { value: null, timestamp: 0 },
-  gex_level: { value: null, timestamp: 0 }
+  sentiment: { value: null, timestamp: 0 }
 };
-
-
 
 // Helper function to update flow data
 const updateFlowData = (key, value) => {
@@ -102,21 +95,18 @@ const getCurrentFlow = (key, timeout = FLOW_TIMEOUT) => {
 };
 
 app.post("/api/data", async (req, res) => {
-  console.log(req.body?.values);
+  console.log(req.body?.values, sentimentData.value);
   console.log("Current time:", new Date().toISOString());
   
   const values = req.body?.values || {};
   const {
-    eth88_top = null,
-    eth88_bottom = null,
+    flow_resistance_1 = null,
+    flow_resistance_2 = null,
+    flow_support_1 = null,
+    flow_support_2 = null,
     orderbook = null,
     flow_middle = null,
     flow_bottom = null,
-    flow_up_level = null,
-    flow_dn_level = null,
-    flow_weak_up_level = null,
-    flow_weak_dn_level = null,
-    gex_level = null,
     current_es = null
   } = values;
 
@@ -125,35 +115,13 @@ app.post("/api/data", async (req, res) => {
     return res.status(400).json({ error: "Missing values object in request body" });
   }
 
-  // Update flow levels
-  updateFlowData('flow_up_level', flow_up_level);
-  updateFlowData('flow_dn_level', flow_dn_level);
-  updateFlowData('flow_weak_up_level', flow_weak_up_level);
-  updateFlowData('flow_weak_dn_level', flow_weak_dn_level);
-  updateFlowData('gex_level', gex_level);
-
    // Update sentiment at 4 AM
   const currentHour = new Date().getHours();
   if (currentHour === 8 && flow_middle !== null) {
     updateFlowData('sentiment', flow_middle > 0 ? "bullish" : "bearish");
   }
 
-  const savedFlowUpLevel = getCurrentFlow('flow_up_level');
-  const savedFlowDnLevel = getCurrentFlow('flow_dn_level');
-  const savedFlowWeakUpLevel = getCurrentFlow('flow_weak_up_level');
-  const savedFlowWeakDnLevel = getCurrentFlow('flow_weak_dn_level');
-  const savedGexLevel = getCurrentFlow('gex_level');
   const currentSentiment = SENTIMENT;
-
-  console.log("Current flow levels:", {
-    up: savedFlowUpLevel,
-    down: savedFlowDnLevel,
-    weakUp: savedFlowWeakUpLevel,
-    weakDown: savedFlowWeakDnLevel,
-    gex: savedGexLevel,
-    sentiment: currentSentiment,
-    current_time: new Date().toISOString()
-  });
 
   // Rest of your existing code, but use the new helper functions
   const flow_near_zero = flow_middle !== null && flow_middle >= -0.02 && flow_middle <= 0.02;
@@ -161,57 +129,69 @@ app.post("/api/data", async (req, res) => {
     Math.abs(flow_middle - flow_bottom) <= 0.01;
   const flow_setup = flow_near_zero || flow_blue_red_intersection;
 
+  const es_near_flow_resistance_1 = current_es !== null && flow_resistance_1 !== null && 
+    Math.abs(current_es - flow_resistance_1) <= 1;
+  
+  const es_near_flow_support_1 = current_es !== null && flow_support_1 !== null && 
+    Math.abs(current_es - flow_support_1) <= 1;
+
+  const es_near_flow_resistance_2 = current_es !== null && flow_resistance_2 !== null && 
+    Math.abs(current_es - flow_resistance_2) <= 1;
+
+  const es_near_flow_support_2 = current_es !== null && flow_support_2 !== null && 
+    Math.abs(current_es - flow_support_2) <= 1;
+
   // Flow + Option Level
-  if (flow_setup && savedFlowUpLevel !== null) {
+  if (flow_setup && es_near_flow_resistance_2) {
     await postToNtfy("https://ntfy.sh/emini_setup", "emini_short_setup", 
-      `Flow + Option Level: ${savedFlowUpLevel} + Sentiment Flow: ${currentSentiment}`);
+      `Flow + Option Level: ${flow_resistance_2} + Sentiment Flow: ${currentSentiment}`);
   }
 
-  if (flow_setup && savedFlowDnLevel !== null) {
+  if (flow_setup && es_near_flow_support_2) {
     await postToNtfy("https://ntfy.sh/emini_setup", "emini_long_setup", 
-      `Flow + Option Level: ${savedFlowDnLevel} + Sentiment Flow: ${currentSentiment}`);
+      `Flow + Option Level: ${flow_support_2} + Sentiment Flow: ${currentSentiment}`);
   }
 
   // Option Flow + Weak Option Level
-  if (flow_near_zero && savedFlowWeakUpLevel !== null) {
+  if (flow_near_zero && es_near_flow_resistance_1) {
     await postToNtfy("https://ntfy.sh/emini_setup", "emini_weak_short_setup", 
-      `Flow + Option Level: ${savedFlowWeakUpLevel} + Sentiment Flow: ${currentSentiment}`);
+      `Flow + Option Level: ${flow_resistance_1} + Sentiment Flow: ${currentSentiment}`);
   }
 
-  if (flow_near_zero  && savedFlowWeakDnLevel !== null) {
+  if (flow_near_zero && es_near_flow_support_1) {
     await postToNtfy("https://ntfy.sh/emini_setup", "emini_weak_long_setup", 
-      `Flow + Option Level: ${savedFlowWeakDnLevel} + Sentiment Flow: ${currentSentiment}`);
+      `Flow + Option Level: ${flow_support_1} + Sentiment Flow: ${currentSentiment}`);
   }
 
   // Order book + WeakOption Level
-  if (orderbook !== null && savedFlowWeakDnLevel !== null && orderbook <= -4.8 && orderbook > -6) {
+  if (orderbook !== null && es_near_flow_support_1 && orderbook <= -4.8 && orderbook > -6) {
     await postToNtfy("https://ntfy.sh/emini_setup", "emini_weak_long_setup",
-      `Order book + Option Level: ${savedFlowWeakDnLevel} + Sentiment Flow: ${currentSentiment}`);
+      `Order book + Option Level: ${flow_support_1} + Sentiment Flow: ${currentSentiment}`);
   }
 
-   if (orderbook !== null && savedFlowWeakUpLevel !== null && orderbook >= 4.8 && orderbook < 6) {
+   if (orderbook !== null && es_near_flow_resistance_1 && orderbook >= 4.8 && orderbook < 6) {
     await postToNtfy("https://ntfy.sh/emini_setup", "emini_weak_short_setup",
-      `Order book + Option Level: ${savedFlowWeakUpLevel} + Sentiment Flow: ${currentSentiment}`);
+      `Order book + Option Level: ${flow_resistance_1} + Sentiment Flow: ${currentSentiment}`);
   }
 
-   // Order book + WeakOption Level
-  if (orderbook !== null && savedFlowDnLevel !== null && orderbook <= -4.8 && orderbook > -6) {
+   // Order book + Flow Level
+  if (orderbook !== null && es_near_flow_support_2 && orderbook <= -4.8 && orderbook > -6) {
     await postToNtfy("https://ntfy.sh/emini_setup", "emini_weak_long_setup",
-      `Order book + Option Level: ${savedFlowDnLevel} + Sentiment Flow: ${currentSentiment}`);
+      `Order book + Option Level: ${flow_support_2} + Sentiment Flow: ${currentSentiment}`);
   }
 
-   if (orderbook !== null && savedFlowUpLevel !== null && orderbook >= 4.8 && orderbook < 6) {
+   if (orderbook !== null && es_near_flow_resistance_2 && orderbook >= 4.8 && orderbook < 6) {
     await postToNtfy("https://ntfy.sh/emini_setup", "emini_weak_short_setup",
-      `Order book + Option Level: ${savedFlowUpLevel} + Sentiment Flow: ${currentSentiment}`);
+      `Order book + Option Level: ${flow_resistance_2} + Sentiment Flow: ${currentSentiment}`);
   }
 
   // if (flow_middle !== null && flow_bottom !== null && Math.abs(flow_middle - flow_bottom) <= 0.01) {
   //   await postToNtfy("https://ntfy.sh/emini_blue_red_intersection", "emini_blue_red_intersection", Math.abs(flow_middle - flow_bottom));
   // }
 
-  if (flow_setup && savedFlowUpLevel !== null) {
+  if (flow_blue_red_intersection && (es_near_flow_support_1 || es_near_flow_support_2)) {
     await postToNtfy("https://ntfy.sh/emini_setup", "emini_setup", 
-      `Flow + Option Level: ${savedFlowUpLevel} + Sentiment Flow: ${currentSentiment}`);
+      `Flow + Option Level: ${flow_support_1 || flow_support_2} + Sentiment Flow: ${currentSentiment}`);
   }
 
   // Order book + Gex Ladder Level
