@@ -85,6 +85,8 @@ app.post("/api/data", async (req, res) => {
     orderbook = null,
     flow_middle = null,
     flow_bottom = null,
+    eth88_top = null,
+    eth88_bottom = null,
     current_es = null
   } = values;
 
@@ -171,6 +173,18 @@ app.post("/api/data", async (req, res) => {
   if (flow_blue_red_intersection && (es_near_flow_support_1 || es_near_flow_support_2)) {
     await postToNtfy("https://ntfy.sh/emini_setup", "emini_setup", 
       `Flow + Option Level: ${flow_support_1 || flow_support_2} + Sentiment Flow: ${currentSentiment}`);
+  }
+
+  // ETH88 between -4.8 and -6 and weak option level
+  if (eth88_bottom !== null && eth88_bottom >= -4.8 && eth88_bottom < -6 && (es_near_flow_support_1 || es_near_flow_support_2)) {
+    await postToNtfy("https://ntfy.sh/emini_setup", "emini_long_setup", 
+      `ETH88 + Option Level: ${eth88_bottom} + Sentiment Flow: ${currentSentiment}`);
+  }
+  
+  // ETH88 between 4.8 and 6 and weak option level
+  if (eth88_top !== null && eth88_top >= 4.8 && eth88_top < 6 && (es_near_flow_resistance_1 || es_near_flow_resistance_2)) {
+    await postToNtfy("https://ntfy.sh/emini_setup", "emini_short_setup", 
+      `ETH88 + Option Level: ${eth88_top} + Sentiment Flow: ${currentSentiment}`);
   }
 
   // Order book + Gex Ladder Level
