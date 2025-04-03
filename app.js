@@ -107,7 +107,7 @@ app.post("/api/data", async (req, res) => {
   const currentSentiment = SENTIMENT;
 
   // post to discord if flow middle is near current es
-  if (flow_avg !== null && Math.abs(flow_avg - current_es) <= 0.02) {
+  if (flow_avg !== null && Math.abs(flow_avg - current_es) <= 0.5) {
     await postToDiscord(`ES approaching avg flow: ${flow_avg}`);
   }
 
