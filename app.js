@@ -84,6 +84,7 @@ app.post("/api/data", async (req, res) => {
     flow_support_2 = null,
     orderbook = null,
     flow_middle = null,
+    flow_avg = null,
     flow_bottom = null,
     eth88_top = null,
     eth88_bottom = null,
@@ -105,8 +106,8 @@ app.post("/api/data", async (req, res) => {
   const currentSentiment = SENTIMENT;
 
   // post to discord if flow middle is near current es
-  if (flow_middle !== null && Math.abs(flow_middle - current_es) <= 0.02) {
-    await postToDiscord(`ES approaching avg flow: ${flow_middle}`);
+  if (flow_avg !== null && Math.abs(flow_avg - current_es) <= 0.02) {
+    await postToDiscord(`ES approaching avg flow: ${flow_avg}`);
   }
 
   // Rest of your existing code, but use the new helper functions
