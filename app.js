@@ -92,6 +92,7 @@ app.post("/api/data", async (req, res) => {
   } = values;
 
   if (!req.body?.values) {
+    console.log(req.body);
     console.error("Missing values object in request body");
     return res.status(400).json({ error: "Missing values object in request body" });
   }
