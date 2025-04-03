@@ -104,88 +104,93 @@ app.post("/api/data", async (req, res) => {
 
   const currentSentiment = SENTIMENT;
 
+  // post to discord if flow middle is near current es
+  if (flow_middle !== null && Math.abs(flow_middle - current_es) <= 0.02) {
+    await postToDiscord(`ES approaching avg flow: ${flow_middle}`);
+  }
+
   // Rest of your existing code, but use the new helper functions
-  const flow_near_zero = flow_middle !== null && flow_middle >= -0.02 && flow_middle <= 0.02;
-  const flow_blue_red_intersection = flow_middle !== null && flow_bottom !== null && 
-    Math.abs(flow_middle - flow_bottom) <= 0.02;
-  const flow_setup = flow_near_zero || flow_blue_red_intersection;
+  // const flow_near_zero = flow_middle !== null && flow_middle >= -0.02 && flow_middle <= 0.02;
+  // const flow_blue_red_intersection = flow_middle !== null && flow_bottom !== null && 
+  //   Math.abs(flow_middle - flow_bottom) <= 0.02;
+  // const flow_setup = flow_near_zero || flow_blue_red_intersection;
 
-  const es_near_flow_resistance_1 = current_es !== null && flow_resistance_1 !== null && 
-    Math.abs(current_es - flow_resistance_1) <= 1;
+  // const es_near_flow_resistance_1 = current_es !== null && flow_resistance_1 !== null && 
+  //   Math.abs(current_es - flow_resistance_1) <= 1;
   
-  const es_near_flow_support_1 = current_es !== null && flow_support_1 !== null && 
-    Math.abs(current_es - flow_support_1) <= 1;
+  // const es_near_flow_support_1 = current_es !== null && flow_support_1 !== null && 
+  //   Math.abs(current_es - flow_support_1) <= 1;
 
-  const es_near_flow_resistance_2 = current_es !== null && flow_resistance_2 !== null && 
-    Math.abs(current_es - flow_resistance_2) <= 1;
+  // const es_near_flow_resistance_2 = current_es !== null && flow_resistance_2 !== null && 
+  //   Math.abs(current_es - flow_resistance_2) <= 1;
 
-  const es_near_flow_support_2 = current_es !== null && flow_support_2 !== null && 
-    Math.abs(current_es - flow_support_2) <= 1;
+  // const es_near_flow_support_2 = current_es !== null && flow_support_2 !== null && 
+  //   Math.abs(current_es - flow_support_2) <= 1;
 
   // Flow + Option Level
-  if (flow_setup && es_near_flow_resistance_2) {
-    await postToNtfy("https://ntfy.sh/emini_setup", "emini_short_setup", 
-      `Flow + Option Level: ${flow_resistance_2} + Sentiment Flow: ${currentSentiment}`);
-  }
-
-  if (flow_setup && es_near_flow_support_2) {
-    await postToNtfy("https://ntfy.sh/emini_setup", "emini_long_setup", 
-      `Flow + Option Level: ${flow_support_2} + Sentiment Flow: ${currentSentiment}`);
-  }
-
-  // Option Flow + Weak Option Level
-  if (flow_near_zero && es_near_flow_resistance_1) {
-    await postToNtfy("https://ntfy.sh/emini_setup", "emini_weak_short_setup", 
-      `Flow + Option Level: ${flow_resistance_1} + Sentiment Flow: ${currentSentiment}`);
-  }
-
-  if (flow_near_zero && es_near_flow_support_1) {
-    await postToNtfy("https://ntfy.sh/emini_setup", "emini_weak_long_setup", 
-      `Flow + Option Level: ${flow_support_1} + Sentiment Flow: ${currentSentiment}`);
-  }
-
-  // Order book + WeakOption Level
-  if (orderbook !== null && es_near_flow_support_1 && orderbook <= -4.8 && orderbook > -6) {
-    await postToNtfy("https://ntfy.sh/emini_setup", "emini_weak_long_setup",
-      `Order book + Option Level: ${flow_support_1} + Sentiment Flow: ${currentSentiment}`);
-  }
-
-   if (orderbook !== null && es_near_flow_resistance_1 && orderbook >= 4.8 && orderbook < 6) {
-    await postToNtfy("https://ntfy.sh/emini_setup", "emini_weak_short_setup",
-      `Order book + Option Level: ${flow_resistance_1} + Sentiment Flow: ${currentSentiment}`);
-  }
-
-   // Order book + Flow Level
-  if (orderbook !== null && es_near_flow_support_2 && orderbook <= -4.8 && orderbook > -6) {
-    await postToNtfy("https://ntfy.sh/emini_setup", "emini_weak_long_setup",
-      `Order book + Option Level: ${flow_support_2} + Sentiment Flow: ${currentSentiment}`);
-  }
-
-   if (orderbook !== null && es_near_flow_resistance_2 && orderbook >= 4.8 && orderbook < 6) {
-    await postToNtfy("https://ntfy.sh/emini_setup", "emini_weak_short_setup",
-      `Order book + Option Level: ${flow_resistance_2} + Sentiment Flow: ${currentSentiment}`);
-  }
-
-  // if (flow_middle !== null && flow_bottom !== null && Math.abs(flow_middle - flow_bottom) <= 0.01) {
-  //   await postToNtfy("https://ntfy.sh/emini_blue_red_intersection", "emini_blue_red_intersection", Math.abs(flow_middle - flow_bottom));
+  // if (flow_setup && es_near_flow_resistance_2) {
+  //   await postToNtfy("https://ntfy.sh/emini_setup", "emini_short_setup", 
+  //     `Flow + Option Level: ${flow_resistance_2} + Sentiment Flow: ${currentSentiment}`);
   // }
 
-  if (flow_blue_red_intersection && (es_near_flow_support_1 || es_near_flow_support_2)) {
-    await postToNtfy("https://ntfy.sh/emini_setup", "emini_setup", 
-      `Flow + Option Level: ${flow_support_1 || flow_support_2} + Sentiment Flow: ${currentSentiment}`);
-  }
+  // if (flow_setup && es_near_flow_support_2) {
+  //   await postToNtfy("https://ntfy.sh/emini_setup", "emini_long_setup", 
+  //     `Flow + Option Level: ${flow_support_2} + Sentiment Flow: ${currentSentiment}`);
+  // }
 
-  // ETH88 between -4.8 and -6 and weak option level
-  if (eth88_bottom !== null && eth88_bottom >= -4.8 && eth88_bottom < -6 && (es_near_flow_support_1 || es_near_flow_support_2)) {
-    await postToNtfy("https://ntfy.sh/emini_setup", "emini_long_setup", 
-      `ETH88 + ${eth88_bottom} + Option Level: ${es_near_flow_support_1 ? flow_support_1 : flow_support_2} + Sentiment Flow: ${currentSentiment}`);
-  }
+  // // Option Flow + Weak Option Level
+  // if (flow_near_zero && es_near_flow_resistance_1) {
+  //   await postToNtfy("https://ntfy.sh/emini_setup", "emini_weak_short_setup", 
+  //     `Flow + Option Level: ${flow_resistance_1} + Sentiment Flow: ${currentSentiment}`);
+  // }
+
+  // if (flow_near_zero && es_near_flow_support_1) {
+  //   await postToNtfy("https://ntfy.sh/emini_setup", "emini_weak_long_setup", 
+  //     `Flow + Option Level: ${flow_support_1} + Sentiment Flow: ${currentSentiment}`);
+  // }
+
+  // // Order book + WeakOption Level
+  // if (orderbook !== null && es_near_flow_support_1 && orderbook <= -4.8 && orderbook > -6) {
+  //   await postToNtfy("https://ntfy.sh/emini_setup", "emini_weak_long_setup",
+  //     `Order book + Option Level: ${flow_support_1} + Sentiment Flow: ${currentSentiment}`);
+  // }
+
+  //  if (orderbook !== null && es_near_flow_resistance_1 && orderbook >= 4.8 && orderbook < 6) {
+  //   await postToNtfy("https://ntfy.sh/emini_setup", "emini_weak_short_setup",
+  //     `Order book + Option Level: ${flow_resistance_1} + Sentiment Flow: ${currentSentiment}`);
+  // }
+
+  //  // Order book + Flow Level
+  // if (orderbook !== null && es_near_flow_support_2 && orderbook <= -4.8 && orderbook > -6) {
+  //   await postToNtfy("https://ntfy.sh/emini_setup", "emini_weak_long_setup",
+  //     `Order book + Option Level: ${flow_support_2} + Sentiment Flow: ${currentSentiment}`);
+  // }
+
+  //  if (orderbook !== null && es_near_flow_resistance_2 && orderbook >= 4.8 && orderbook < 6) {
+  //   await postToNtfy("https://ntfy.sh/emini_setup", "emini_weak_short_setup",
+  //     `Order book + Option Level: ${flow_resistance_2} + Sentiment Flow: ${currentSentiment}`);
+  // }
+
+  // // if (flow_middle !== null && flow_bottom !== null && Math.abs(flow_middle - flow_bottom) <= 0.01) {
+  // //   await postToNtfy("https://ntfy.sh/emini_blue_red_intersection", "emini_blue_red_intersection", Math.abs(flow_middle - flow_bottom));
+  // // }
+
+  // if (flow_blue_red_intersection && (es_near_flow_support_1 || es_near_flow_support_2)) {
+  //   await postToNtfy("https://ntfy.sh/emini_setup", "emini_setup", 
+  //     `Flow + Option Level: ${flow_support_1 || flow_support_2} + Sentiment Flow: ${currentSentiment}`);
+  // }
+
+  // // ETH88 between -4.8 and -6 and weak option level
+  // if (eth88_bottom !== null && eth88_bottom >= -4.8 && eth88_bottom < -6 && (es_near_flow_support_1 || es_near_flow_support_2)) {
+  //   await postToNtfy("https://ntfy.sh/emini_setup", "emini_long_setup", 
+  //     `ETH88 + ${eth88_bottom} + Option Level: ${es_near_flow_support_1 ? flow_support_1 : flow_support_2} + Sentiment Flow: ${currentSentiment}`);
+  // }
   
-  // ETH88 between 4.8 and 6 and weak option level
-  if (eth88_top !== null && eth88_top >= 4.8 && eth88_top < 6 && (es_near_flow_resistance_1 || es_near_flow_resistance_2)) {
-    await postToNtfy("https://ntfy.sh/emini_setup", "emini_short_setup", 
-      `ETH88 + ${eth88_top} + Option Level: ${es_near_flow_resistance_1 ? flow_resistance_1 : flow_resistance_2} + Sentiment Flow: ${currentSentiment}`);
-  }
+  // // ETH88 between 4.8 and 6 and weak option level
+  // if (eth88_top !== null && eth88_top >= 4.8 && eth88_top < 6 && (es_near_flow_resistance_1 || es_near_flow_resistance_2)) {
+  //   await postToNtfy("https://ntfy.sh/emini_setup", "emini_short_setup", 
+  //     `ETH88 + ${eth88_top} + Option Level: ${es_near_flow_resistance_1 ? flow_resistance_1 : flow_resistance_2} + Sentiment Flow: ${currentSentiment}`);
+  // }
 
   // Order book + Gex Ladder Level
   // if (savedGexLevel !== null && orderbook !== null && orderbook <= -4.8 && orderbook > -6) {
