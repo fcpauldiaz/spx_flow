@@ -107,8 +107,8 @@ app.post("/api/data", async (req, res) => {
   const currentSentiment = SENTIMENT;
 
   // post to discord if flow middle is near current es
-  if (flow_avg !== null && Math.abs(flow_avg - current_es) <= 0.5) {
-    await postToDiscord(`ES approaching avg flow: ${flow_avg}`);
+  if (flow_avg !== null && Math.abs(flow_avg - current_es) <= 2) {
+    await postToNtfy("https://ntfy.sh/emini_setup", "avg_flow", `ES approaching avg flow: ${flow_avg}`);
   }
 
   // Rest of your existing code, but use the new helper functions
